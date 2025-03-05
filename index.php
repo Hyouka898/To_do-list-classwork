@@ -73,26 +73,7 @@
                 </tr>
             </thead>
             <tbody id="productTable">
-                <tbody>
-                   
-                    <tr>
-                        <td>1</td>
-                        <td>Jane Smith</td>
-                        <td><img src="https://via.placeholder.com/50" alt="User Image" class="rounded-circle"></td>
-                        <td>
-                            <span class="badge bg-success">Done</span>
-                        </td>
-                        <td><span class="badge bg-danger">Inactive</span></td>
-                        <td>
-                            <button id="btnUpdate" class="btn btn-warning btn-sm"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button id="btnViewDel" class="btn btn-info btn-sm text-white">
-                                <i class="fa-solid fa-calendar-week"></i>
-                            </button>
-                            <button id="btnDelete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-
-                </tbody>
+               
             </tbody>
         </table>
 
@@ -112,19 +93,11 @@
                     <input type="text" id="productName" name="name" class="form-control" required>
                 </div>
 
-                <!-- Inside Modal Body -->
-                <div class="mb-3">
-                    <label class="form-label">Status</label>
-                    <select class="form-select" id="productStatus">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
 
                 <div class="mb-3 " >
                     <input class="form-check-input shadow-none border-sm" type="checkbox" value="" id="defaultCheck1">
                     <label class="form-check-label" for="defaultCheck1">
-                        Default checkbox
+                        Status
                     </label>
                 </div>
                 
@@ -143,71 +116,180 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+<script>
+document.getElementById('productImage').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImage').src = e.target.result;
+            document.getElementById('previewImage').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
-        document.getElementById('productImage').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImage').src = e.target.result;
-                    document.getElementById('previewImage').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+const drawer = document.getElementById('drawer');
+document.getElementById('openDrawer').addEventListener('click', () => {
+    drawer.classList.add('open');
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    document.getElementById('previewImage').src = '';
+    document.getElementById('defaultCheck1').checked = true; // Default status = 1
+});
+
+document.getElementById('closeDrawer').addEventListener('click', () => {
+    drawer.classList.remove('open');
+});
+
+// Load Products
+function loadProducts() {
+    $.ajax({
+        url: 'api.php',
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            let rows = '';
+            data.forEach((product, index) => {
+                rows += `
+                    <tr id="row_${product.id}">
+                        <td>${product.id}</td>
+                        <td>${product.title}</td>
+                        <td><img src="uploads/${product.image}" class="product-image"></td>
+                        <td><span class="badge ${product.status == 1 ? 'bg-success' : 'bg-danger'}">${product.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge bg-${product.status == 1 ? 'success' : 'danger'}">${product.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${product.id})"><i class="fa-solid fa-calendar-week"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            $('#productTable').html(rows);
+        }
+    });
+}
+
+// Save (Insert/Update)
+$('#productForm').on('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    let id = $('#productId').val();
+    let status = $('#defaultCheck1').is(':checked') ? 1 : 0;
+    formData.append('status', status);
+
+    $.ajax({
+        url: 'api.php',
+        method: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.error) {
+                Swal.fire('Error', response.error, 'error');
+                return;
             }
-        });
-
-        const drawer = document.getElementById('drawer');
-        document.getElementById('openDrawer').addEventListener('click', () => {
-            drawer.classList.add('open');
-            document.getElementById('productForm').reset();
-        });
-        document.getElementById('closeDrawer').addEventListener('click', () => {
             drawer.classList.remove('open');
-        });
+            if (id) {
+                // Update row
+                $(`#row_${id}`).replaceWith(`
+                    <tr id="row_${response.id}">
+                        <td>${response.id}</td>
+                        <td>${response.title}</td>
+                        <td><img src="uploads/${response.image}" class="product-image"></td>
+                        <td><span class="badge ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editProduct(${response.id})"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${response.id})"><i class="fa-solid fa-calendar-week"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${response.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`);
+                Swal.fire('Success', 'Product updated successfully!', 'success');
+            } else {
+                // Add new row
+                $('#productTable').prepend(`
+                    <tr id="row_${response.id}">
+                        <td>${response.id}</td>
+                        <td>${response.title}</td>
+                        <td><img src="uploads/${response.image}" class="product-image"></td>
+                        <td><span class="badge ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editProduct(${response.id})"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${response.id})"><i class="fa-solid fa-calendar-week"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${response.id})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`);
+                Swal.fire('Success', 'Product added successfully!', 'success');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', 'Something went wrong!', 'error');
+        }
+    });
+});
 
-        // update 
-        document.getElementById('btnUpdate').addEventListener('click', () => {
-            drawer.classList.add('open');
-            document.getElementById('productForm').reset();
-        });
-        
-        // view detail
-        document.getElementById('btnViewDel').addEventListener('click', () => {
-            drawer.classList.add('open');
-            document.getElementById('productForm').reset();
-        });
-        
+// Edit Product
+function editProduct(id) {
+    $.ajax({
+        url: 'api.php',
+        method: 'GET',
+        data: { id: id },
+        dataType: 'json',
+        success: function(data) {
+            let product = data.find(p => p.id == id);
+            if (product) {
+                $('#productId').val(product.id);
+                $('#productCode').val(product.id); // Assuming code is ID for simplicity
+                $('#productName').val(product.title);
+                $('#defaultCheck1').prop('checked', product.status == 1);
+                $('#previewImage').attr('src', 'uploads/' + product.image);
+                drawer.classList.add('open');
+            }
+        }
+    });
+}
 
-        function loadProducts(query = '') {
+// View Product (just open drawer with disabled inputs if needed)
+function viewProduct(id) {
+    editProduct(id); // Reuse editProduct for simplicity
+    $('#productForm input, #productForm button[type="submit"]').prop('disabled', true);
+    setTimeout(() => $('#productForm input, #productForm button[type="submit"]').prop('disabled', false), 1000);
+}
+
+// Delete Product
+function deleteProduct(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
             $.ajax({
-                url: 'product_actions.php',
-                method: 'GET',
-                data: { query },
+                url: 'api.php?id=' + id,
+                method: 'DELETE',
                 dataType: 'json',
-                success: function (data) {
-                    let rows = '';
-                    data.forEach((product, index) => {
-                        rows += `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><img src="uploads/${product.image}" class="product-image"></td>
-                                <td>${product.code}</td>
-                                <td>${product.name}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})">Edit</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Delete</button>
-                                </td>
-                            </tr>`;
-                    });
-                    $('#productTable').html(rows);
+                success: function(response) {
+                    if (response.success) {
+                        $(`#row_${id}`).remove();
+                        Swal.fire('Deleted!', 'Product has been deleted.', 'success');
+                    } else {
+                        Swal.fire('Error', response.error, 'error');
+                    }
                 }
             });
         }
+    });
+}
 
-        loadProducts();
-    </script>
+loadProducts();
+</script>
 
 </body>
 </html>
