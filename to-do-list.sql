@@ -10,7 +10,13 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
+CREATE TABLE `tbl_to_do` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT 1,
+  `image` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -27,13 +33,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `tbl_to_do`
 --
 
-CREATE TABLE `tbl_to_do` (
-  `id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `status` int(11) NOT NULL DEFAULT 1,
-  `image` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 --
 -- Indexes for dumped tables
