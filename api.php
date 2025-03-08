@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql .= " WHERE id=$id";
     } else {
         // Insert (status is default 1, no need to insert it explicitly)
-        $sql = "INSERT INTO tbl_to_do (title, image, created_at) VALUES ('$title', '$image', NOW())";
+        $sql = "INSERT INTO tbl_to_do (title, image,status, created_at) VALUES ('$title', '$image','$status', NOW())";
     }
 
     if ($conn->query($sql)) {

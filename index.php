@@ -61,7 +61,7 @@
 
         <!-- table -->
         <hr>
-        <table class="table table-striped">
+        <table class="table table-striped align-middle">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -84,10 +84,10 @@
             <h4>Add Product</h4>
             <form id="productForm" enctype="multipart/form-data">
                 <input type="hidden" id="productId" name="id">
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label class="form-label">Product Code</label>
                     <input type="text" id="productCode" name="code" class="form-control" required>
-                </div>
+                </div> -->
                 <div class="mb-3">
                     <label class="form-label">Name</label>
                     <input type="text" id="productName" name="name" class="form-control" required>
@@ -158,8 +158,8 @@ function loadProducts() {
                         <td>${product.id}</td>
                         <td>${product.title}</td>
                         <td><img src="uploads/${product.image}" class="product-image"></td>
-                        <td><span class="badge ${product.status == 1 ? 'bg-success' : 'bg-danger'}">${product.status == 1 ? 'Done' : 'Pending'}</span></td>
-                        <td><span class="badge bg-${product.status == 1 ? 'success' : 'danger'}">${product.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td><span class="badge px-3 py-2 ${product.status == 1 ? 'bg-success' : 'bg-danger'}">${product.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge px-3 py-2 bg-${product.status == 1 ? 'success' : 'danger'}">${product.status == 1 ? 'Active' : 'Inactive'}</span></td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${product.id})"><i class="fa-solid fa-calendar-week"></i></button>
@@ -200,8 +200,8 @@ $('#productForm').on('submit', function(e) {
                         <td>${response.id}</td>
                         <td>${response.title}</td>
                         <td><img src="uploads/${response.image}" class="product-image"></td>
-                        <td><span class="badge ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
-                        <td><span class="badge bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td><span class="badge px-3 py-2 ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge px-3 py-2 bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editProduct(${response.id})"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${response.id})"><i class="fa-solid fa-calendar-week"></i></button>
