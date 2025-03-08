@@ -216,8 +216,8 @@ $('#productForm').on('submit', function(e) {
                         <td>${response.id}</td>
                         <td>${response.title}</td>
                         <td><img src="uploads/${response.image}" class="product-image"></td>
-                        <td><span class="badge ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
-                        <td><span class="badge bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
+                        <td><span class="badge px-3 py-2 ${response.status == 1 ? 'bg-success' : 'bg-danger'}">${response.status == 1 ? 'Done' : 'Pending'}</span></td>
+                        <td><span class="badge px-3 py-2 bg-${response.status == 1 ? 'success' : 'danger'}">${response.status == 1 ? 'Active' : 'Inactive'}</span></td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editProduct(${response.id})"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button class="btn btn-info btn-sm text-white" onclick="viewProduct(${response.id})"><i class="fa-solid fa-calendar-week"></i></button>
